@@ -7,191 +7,159 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.beautyplus.R
 import com.beautyplus.routing.Screen
+import com.beautyplus.ui.beautyPlusPreference.BeautyPlusPreference
 import com.beautyplus.ui.model.SaloonModel
 import com.beautyplus.ui.theme.BeautyPlusTheme
 import com.beautyplus.ui.theme.appColor
 import com.beautyplus.ui.theme.white
 import com.beautyplus.utils.RoundedButton
+import com.beautyplus.ui.drawer.DrawerBody
+import com.beautyplus.ui.drawer.DrawerHeader
+import com.beautyplus.ui.drawer.TopBar
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(navController: NavController) {
     val context = LocalContext.current
+    val preference = remember {
+        BeautyPlusPreference(context)
+    }
     val scrollState = rememberScrollState()
-    val list = ArrayList<SaloonModel>().apply {
+    val dataList = MutableLiveData<ArrayList<SaloonModel>>(ArrayList())
+    val scope = rememberCoroutineScope()
+    var isLogout by remember { mutableStateOf(false) }
+    val scaffoldState = rememberScaffoldState()
+    dataList.value!!.apply {
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "Sally Beauty (Middlesbrough, England)",
+                address = "Industrial Estate, Unit 10 Newport Way, Cannon Park Way, Middlesbrough TS1 5JW, UK"
             )
         )
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "Aspire Hairdressing & Beauty",
+                address = "159 Linthorpe Rd, Middlesbrough TS1 4AG, United Kingdom"
             )
         )
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "Salon Services",
+                address = "1 Douglas Cl, Preston Farm Industrial Estate, Stockton-on-Tees TS18 3SB, UK"
             )
         )
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "Trade Hair Supplies (Ray & Co)",
+                address = "3 Newport Way, Middlesbrough TS1 5JW, UK"
             )
         )
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "A&S Beauty",
+                address = "67 Newport Rd., Middlesbrough TS1 1LA, United Kingdom"
             )
         )
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "Manha's Hair And Beauty Salon",
+                address = "25 Princes Rd, Middlesbrough TS1 4BE, United Kingdom"
             )
         )
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "MARIAM HAIR AND BEAUTY LIMITED",
+                address = "United Kingdom"
             )
         )
         add(
             SaloonModel(
                 id = "",
                 image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                name = "Cosmetology Middlesbrough Ltd",
+                address = "5 Acklam Rd, Middlesbrough TS5 5HE, United Kingdom"
             )
         )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
-        add(
-            SaloonModel(
-                id = "",
-                image = "",
-                name = "Test Saloon",
-                address = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
-            )
-        )
+
     }
     BeautyPlusTheme {
-        Scaffold {
+        androidx.compose.material.Scaffold(
+            scaffoldState = scaffoldState,
+            topBar = {
+                TopBar(
+                    navController = navController,
+                    onNavigationIconClick = {
+                        scope.launch {
+                            scaffoldState.drawerState.open()
+                        }
+                    }
+                )
+            },
+            modifier = Modifier.background(color = appColor),
+            drawerContent = {
+                DrawerHeader()
+                DrawerBody(onHistory = {
+                    navController.navigate(Screen.BookingHistory.route)
+                    scope.launch {
+                        scaffoldState.drawerState.close()
+                    }
+                },onLogout = {
+                    isLogout = true
+                    scope.launch {
+                        scaffoldState.drawerState.close()
+                    }
+                })
+            },
+            backgroundColor = appColor,
+            contentColor = appColor,
+            drawerBackgroundColor = appColor
+        ) { paddingValues ->
+            Modifier.padding(
+                bottom = paddingValues.calculateBottomPadding()
+            )
             Column(
                 modifier = Modifier
                     .background(color = appColor)
                     .padding(top = 40.dp)
                     .verticalScroll(scrollState)
             ) {
-                SmallTopAppBar(
-                    title = {
-                        Text(
-                            text = "Home Screen", color = Color.White,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp),
-                            style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                        )
-                    },
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
-                        containerColor = appColor,
-                        titleContentColor = Color.White
-                    )
-                )
-                Spacer(Modifier.height(10.dp))
+
                 Column {
-                    list.forEachIndexed { index, saloonModel ->
+                    dataList.value!!.forEachIndexed { index, saloonModel ->
                         Card(
                             modifier = Modifier
                                 .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
@@ -236,6 +204,41 @@ fun MainScreen(navController: NavController) {
                     }
                 }
             }
+        }
+        if (isLogout) {
+            AlertDialog(
+                onDismissRequest = {
+                    isLogout = false
+                },
+                title = { Text(stringResource(id = R.string.app_name)) },
+                text = { Text("Are you sure you want to logout ?") },
+                confirmButton = {
+                    RoundedButton(
+                        text = "Cancel",
+                        textColor = white,
+                        onClick = { isLogout = false }
+                    )
+                },
+                dismissButton = {
+
+                    RoundedButton(
+                        text = "Logout",
+                        textColor = white,
+                        onClick = {
+                            preference.saveData("isLogin", false)
+                            navController.navigate(
+                                Screen.LoginScreen.route
+                            ) {
+                                popUpTo(Screen.MainScreen.route) {
+                                    inclusive = true
+                                }
+                            }
+                            isLogout = false
+                        }
+                    )
+
+                }
+            )
         }
 
 

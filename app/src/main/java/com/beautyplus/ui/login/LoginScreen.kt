@@ -33,9 +33,11 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.beautyplus.R
 import com.beautyplus.routing.Screen
+import com.beautyplus.ui.beautyPlusPreference.BeautyPlusPreference
 import com.beautyplus.ui.theme.BeautyPlusTheme
 import com.beautyplus.utils.OutlineFormField
 import com.beautyplus.utils.RoundedButton
+import com.beautyplus.utils.isValidEmail
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -44,6 +46,9 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
+    val preference = remember {
+        BeautyPlusPreference(context)
+    }
     var mobileNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val db = Firebase.firestore
@@ -80,7 +85,7 @@ fun LoginScreen(navController: NavController) {
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom
+                verticalArrangement = Arrangement.Center
             ) {
                 Box(Modifier.padding(bottom = 60.dp)) {
                     Card(
@@ -160,6 +165,10 @@ fun LoginScreen(navController: NavController) {
                                                         if (document.data["mobile"] == mobileNumber &&
                                                             document.data["password"] == password
                                                         ) {
+                                                            preference.saveData(
+                                                                "isLogin",
+                                                                true
+                                                            )
                                                             Toast.makeText(
                                                                 context,
                                                                 "Login successfully.",

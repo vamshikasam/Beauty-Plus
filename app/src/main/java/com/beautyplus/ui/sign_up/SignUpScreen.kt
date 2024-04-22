@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import com.beautyplus.MainActivity
 import com.beautyplus.R
 import com.beautyplus.routing.Screen
+import com.beautyplus.ui.beautyPlusPreference.BeautyPlusPreference
 import com.beautyplus.ui.theme.BeautyPlusTheme
 import com.beautyplus.utils.OutlineFormField
 import com.beautyplus.utils.RoundedButton
@@ -48,6 +49,9 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun SignUpScreen(navController: NavController) {
     val context = LocalContext.current
+    val preference = remember {
+        BeautyPlusPreference(context)
+    }
     var backEnabled by remember { mutableStateOf(true) }
     var dialog: Dialog? = null
     var name by remember { mutableStateOf("") }
@@ -89,7 +93,7 @@ fun SignUpScreen(navController: NavController) {
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom
+                verticalArrangement = Arrangement.Center
             ) {
                 Box(Modifier.padding(bottom = 60.dp)) {
                     Card(
@@ -173,12 +177,22 @@ fun SignUpScreen(navController: NavController) {
                                                         db.collection("users")
                                                             .add(user)
                                                             .addOnSuccessListener { documentReference ->
+                                                                preference.saveData(
+                                                                    "isLogin",
+                                                                    true
+                                                                )
                                                                 Toast.makeText(
                                                                     context,
                                                                     "Register successfully.",
                                                                     Toast.LENGTH_SHORT
                                                                 ).show()
-
+                                                                navController.navigate(
+                                                                    Screen.MainScreen.route
+                                                                ) {
+                                                                    popUpTo(Screen.LoginScreen.route) {
+                                                                        inclusive = true
+                                                                    }
+                                                                }
                                                             }
                                                             .addOnFailureListener { e ->
                                                                 Toast.makeText(
@@ -202,6 +216,10 @@ fun SignUpScreen(navController: NavController) {
                                                                 db.collection("users")
                                                                     .add(user)
                                                                     .addOnSuccessListener { documentReference ->
+                                                                        preference.saveData(
+                                                                            "isLogin",
+                                                                            true
+                                                                        )
                                                                         Toast.makeText(
                                                                             context,
                                                                             "Register successfully.",
@@ -237,6 +255,7 @@ fun SignUpScreen(navController: NavController) {
                                                 "Please enter password.",
                                                 Toast.LENGTH_LONG
                                             ).show()
+
                                         }
                                     } else {
                                         Toast.makeText(
@@ -244,6 +263,7 @@ fun SignUpScreen(navController: NavController) {
                                             "Please enter mobile number.",
                                             Toast.LENGTH_LONG
                                         ).show()
+
                                     }
                                 } else {
                                     Toast.makeText(
@@ -265,7 +285,7 @@ fun SignUpScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Don't have an account?",
+                        "Already have an account?",
                         textAlign = TextAlign.End,
                         style = TextStyle(color = colorResource(id = R.color.white))
                     )

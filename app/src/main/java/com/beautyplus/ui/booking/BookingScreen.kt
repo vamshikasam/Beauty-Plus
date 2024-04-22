@@ -4,13 +4,18 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -21,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavController
 import com.beautyplus.R
 import com.beautyplus.routing.Screen
@@ -38,6 +46,7 @@ import com.beautyplus.ui.theme.appColor
 import com.beautyplus.ui.theme.white
 import com.beautyplus.utils.OutlineFormField
 import com.beautyplus.utils.RoundedButton
+import com.beautyplus.utils.isValidEmail
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -51,6 +60,26 @@ fun BookingScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var mobileNumber by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
+    var slotDropDown by remember { mutableStateOf("") }
+    var slots by rememberSaveable { mutableStateOf(false) }
+    var isSubmit by rememberSaveable { mutableStateOf(false) }
+    val slotsList =
+        listOf(
+            "10 AM to 11 AM",
+            "11 AM to 12 PM",
+            "12 PM to 1 PM",
+            "1 PM to 2 PM",
+            "2 PM to 3 PM",
+            "3 PM to 4 PM",
+            "4 PM to 5 PM",
+            "5 PM to 6 PM",
+            "6 PM to 7 PM"
+        )
+
+    val icon = if (slots)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
     BeautyPlusTheme {
         Scaffold {
             Column(
@@ -62,7 +91,7 @@ fun BookingScreen(navController: NavController) {
                 SmallTopAppBar(
                     title = {
                         Text(
-                            text = "Detail Screen", color = Color.White,
+                            text = "Book Screen", color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(10.dp),
@@ -75,9 +104,11 @@ fun BookingScreen(navController: NavController) {
                                 navController.navigateUp()
                             }
                         ) {
-                            Icon(imageVector = Icons.Rounded.ArrowBack,
+                            Icon(
+                                imageVector = Icons.Rounded.ArrowBack,
                                 tint = Color.White,
-                                contentDescription = "Back")
+                                contentDescription = "Back"
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -143,30 +174,115 @@ fun BookingScreen(navController: NavController) {
                             )
 
                             Spacer(modifier = Modifier.height(5.dp))
+                            OutlinedTextField(
+                                value = if (slotDropDown != "") slotDropDown else "Select slot",
+                                onValueChange = { slotDropDown = it },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp)
+                                    .clickable { slots = !slots },
+                                enabled = false,
+                                trailingIcon = {
+                                    Icon(
+                                        icon, "contentDescription",
+                                        tint = Color.Black
+                                    )
+                                },
+                                textStyle = TextStyle(color = Color.Black),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = appColor,
+                                    unfocusedBorderColor = appColor,
+                                    disabledBorderColor = appColor
+                                ),
+                                shape = RoundedCornerShape(10.dp),
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            ) {
+                                if (slots) {
+                                    Popup(
+                                        alignment = Alignment.TopCenter,
+                                        properties = PopupProperties(
+                                            excludeFromSystemGesture = true,
+                                        ),
+                                        onDismissRequest = { slots = false }
+                                    ) {
+
+                                        Column(
+                                            modifier = Modifier
+                                                .heightIn(max = 220.dp)
+                                                .verticalScroll(state = scrollState)
+                                                .padding(10.dp)
+                                                .border(width = 1.dp, color = Color.Gray),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                        ) {
+
+                                            slotsList.onEachIndexed { index, item ->
+                                                if (index != 0) {
+                                                    Divider(
+                                                        thickness = 1.dp,
+                                                        color = Color.LightGray
+                                                    )
+                                                }
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .background(white)
+                                                        .padding(10.dp)
+                                                        .clickable {
+                                                            slotDropDown = item
+                                                            slots = !slots
+                                                        },
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = item,
+                                                        style = TextStyle(color = Color.Black)
+                                                    )
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
                             RoundedButton(
                                 text = "Submit",
                                 onClick = {
                                     if (name.isNotEmpty()) {
                                         if (email.isNotEmpty()) {
-                                            if (mobileNumber.isNotEmpty()) {
-                                                if (address.isNotEmpty()) {
-                                                    Toast.makeText(
-                                                        context,
-                                                        "Booking successfully.",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-                                                    navController.navigateUp()
+                                            if (!isValidEmail(email.toString().trim())) {
+                                                if (mobileNumber.isNotEmpty()) {
+                                                    if (address.isNotEmpty()) {
+                                                        if (slotDropDown.isNotEmpty()) {
+                                                            isSubmit = true
+                                                        } else {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Please select slot.",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
+                                                        }
+                                                    } else {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Please enter address.",
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    }
                                                 } else {
                                                     Toast.makeText(
                                                         context,
-                                                        "Please enter address.",
+                                                        "Please enter mobile number.",
                                                         Toast.LENGTH_LONG
                                                     ).show()
                                                 }
                                             } else {
                                                 Toast.makeText(
                                                     context,
-                                                    "Please enter mobile number.",
+                                                    "Please enter valid email.",
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                             }
@@ -194,6 +310,26 @@ fun BookingScreen(navController: NavController) {
 
                 }
             }
+        }
+        if (isSubmit) {
+            AlertDialog(
+                onDismissRequest = {
+                    isSubmit = false
+                },
+                title = { Text(stringResource(id = R.string.app_name)) },
+                text = { Text("You have successfully booked the service.") },
+                confirmButton = {
+                    RoundedButton(
+                        text = "Ok",
+                        textColor = white,
+                        onClick = {
+                            navController.navigateUp()
+                            isSubmit = false
+                        }
+                    )
+                },
+                dismissButton = {}
+            )
         }
 
 

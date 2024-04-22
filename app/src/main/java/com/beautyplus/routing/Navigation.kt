@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.beautyplus.ui.booking.BookingScreen
+import com.beautyplus.ui.booking_history.BookingHistoryScreen
 import com.beautyplus.ui.detail.DetailScreen
 import com.beautyplus.ui.login.LoginScreen
 import com.beautyplus.ui.main.MainScreen
@@ -36,6 +37,9 @@ fun Navigation() {
         }
         composable(route = Screen.BookingScreen.route) { navBackStack ->
             BookingScreen(navController = navController)
+        }
+        composable(route = Screen.BookingHistory.route) { navBackStack ->
+            BookingHistoryScreen(navController = navController)
         }
     }
 
