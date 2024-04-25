@@ -32,8 +32,18 @@ fun Navigation() {
         composable(route = Screen.MainScreen.route) { navBackStack ->
             MainScreen(navController = navController)
         }
-        composable(route = Screen.DetailScreen.route) { navBackStack ->
-            DetailScreen(navController = navController)
+        composable(route = Screen.DetailScreen.route+ "/{name}"+"/{address}") { navBackStack ->
+            val name = navBackStack.arguments?.getString("name")
+            val address = navBackStack.arguments?.getString("address")
+            if (name != null) {
+                if (address != null) {
+                    DetailScreen(
+                        navController = navController,
+                        name = name,
+                        address = address,
+                    )
+                }
+            }
         }
         composable(route = Screen.BookingScreen.route) { navBackStack ->
             BookingScreen(navController = navController)

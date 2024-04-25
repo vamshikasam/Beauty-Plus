@@ -196,7 +196,7 @@ fun MainScreen(navController: NavController) {
                                 RoundedButton(
                                     text = "Show Detail",
                                     onClick = {
-                                        navController.navigate(Screen.DetailScreen.route)
+                                        navController.navigate(Screen.DetailScreen.route+ "/${saloonModel.name}"+"/${saloonModel.address}")
                                     }
                                 )
                             }

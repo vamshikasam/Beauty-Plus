@@ -40,13 +40,16 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavController
 import com.beautyplus.R
+import com.beautyplus.application.AppData
 import com.beautyplus.routing.Screen
+import com.beautyplus.ui.model.BookingModel
 import com.beautyplus.ui.theme.BeautyPlusTheme
 import com.beautyplus.ui.theme.appColor
 import com.beautyplus.ui.theme.white
-import com.beautyplus.utils.OutlineFormField
+import com.beautyplus.utils.BeautyPlusField
 import com.beautyplus.utils.RoundedButton
 import com.beautyplus.utils.isValidEmail
+import com.beautyplus.utils.isValidText
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -132,7 +135,7 @@ fun BookingScreen(navController: NavController) {
 
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            OutlineFormField(
+                            BeautyPlusField(
                                 value = name,
                                 onValueChange = { text ->
                                     name = text
@@ -142,7 +145,7 @@ fun BookingScreen(navController: NavController) {
                             )
 
                             Spacer(modifier = Modifier.height(5.dp))
-                            OutlineFormField(
+                            BeautyPlusField(
                                 value = email,
                                 onValueChange = { text ->
                                     email = text
@@ -152,7 +155,7 @@ fun BookingScreen(navController: NavController) {
                             )
 
                             Spacer(modifier = Modifier.height(5.dp))
-                            OutlineFormField(
+                            BeautyPlusField(
                                 value = mobileNumber,
                                 onValueChange = { text ->
                                     if (text.length <= 10)
@@ -164,7 +167,7 @@ fun BookingScreen(navController: NavController) {
 
                             Spacer(Modifier.height(10.dp))
 
-                            OutlineFormField(
+                            BeautyPlusField(
                                 value = address,
                                 onValueChange = { text ->
                                     address = text
@@ -252,44 +255,60 @@ fun BookingScreen(navController: NavController) {
                                 text = "Submit",
                                 onClick = {
                                     if (name.isNotEmpty()) {
-                                        if (email.isNotEmpty()) {
-                                            if (!isValidEmail(email.toString().trim())) {
-                                                if (mobileNumber.isNotEmpty()) {
-                                                    if (address.isNotEmpty()) {
-                                                        if (slotDropDown.isNotEmpty()) {
-                                                            isSubmit = true
+                                        if (!isValidText(name.trim())) {
+                                            if (email.isNotEmpty()) {
+                                                if (!isValidEmail(email.toString().trim())) {
+                                                    if (mobileNumber.isNotEmpty()) {
+                                                        if (mobileNumber.length < 10) {
+                                                            if (address.isNotEmpty()) {
+                                                                if (slotDropDown.isNotEmpty()) {
+                                                                    isSubmit = true
+                                                                } else {
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        "Please select slot.",
+                                                                        Toast.LENGTH_LONG
+                                                                    ).show()
+                                                                }
+                                                            } else {
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    "Please enter address.",
+                                                                    Toast.LENGTH_LONG
+                                                                ).show()
+                                                            }
                                                         } else {
                                                             Toast.makeText(
                                                                 context,
-                                                                "Please select slot.",
+                                                                "Please enter valid mobile number.",
                                                                 Toast.LENGTH_LONG
                                                             ).show()
                                                         }
                                                     } else {
                                                         Toast.makeText(
                                                             context,
-                                                            "Please enter address.",
+                                                            "Please enter mobile number.",
                                                             Toast.LENGTH_LONG
                                                         ).show()
                                                     }
                                                 } else {
                                                     Toast.makeText(
                                                         context,
-                                                        "Please enter mobile number.",
+                                                        "Please enter valid email.",
                                                         Toast.LENGTH_LONG
                                                     ).show()
                                                 }
                                             } else {
                                                 Toast.makeText(
                                                     context,
-                                                    "Please enter valid email.",
+                                                    "Please enter email.",
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                             }
                                         } else {
                                             Toast.makeText(
                                                 context,
-                                                "Please enter email.",
+                                                "Please enter valid name.",
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
@@ -323,6 +342,17 @@ fun BookingScreen(navController: NavController) {
                         text = "Ok",
                         textColor = white,
                         onClick = {
+                            AppData.list.apply {
+                                add(
+                                    BookingModel(
+                                        id = "",
+                                        name = name,
+                                        email = email,
+                                        slot = slotDropDown,
+                                        address = address
+                                    )
+                                )
+                            }
                             navController.navigateUp()
                             isSubmit = false
                         }

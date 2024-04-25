@@ -35,7 +35,7 @@ import com.beautyplus.utils.RoundedButton
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun DetailScreen(navController: NavController) {
+fun DetailScreen(navController: NavController,name:String,address:String) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     BeautyPlusTheme {
@@ -94,7 +94,7 @@ fun DetailScreen(navController: NavController) {
                         )
                     }
                     Text(
-                        "Test Saloon",
+                        name,
                         fontSize = 14.sp,
                         color = Color.Black,
                         modifier = Modifier
@@ -115,7 +115,7 @@ fun DetailScreen(navController: NavController) {
                             .padding(vertical = 5.dp, horizontal = 10.dp)
                     )
                     Text(
-                        "Address : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                        "Address : $address",
                         fontSize = 14.sp,
                         color = Color.Black,
                         modifier = Modifier

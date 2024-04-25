@@ -39,8 +39,11 @@ import com.beautyplus.R
 import com.beautyplus.routing.Screen
 import com.beautyplus.ui.beautyPlusPreference.BeautyPlusPreference
 import com.beautyplus.ui.theme.BeautyPlusTheme
-import com.beautyplus.utils.OutlineFormField
+import com.beautyplus.ui.theme.appColor
+import com.beautyplus.ui.theme.white
+import com.beautyplus.utils.BeautyPlusField
 import com.beautyplus.utils.RoundedButton
+import com.beautyplus.utils.isValidText
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -52,6 +55,7 @@ fun SignUpScreen(navController: NavController) {
     val preference = remember {
         BeautyPlusPreference(context)
     }
+    var beautySignup by remember { mutableStateOf(false) }
     var backEnabled by remember { mutableStateOf(true) }
     var dialog: Dialog? = null
     var name by remember { mutableStateOf("") }
@@ -117,7 +121,7 @@ fun SignUpScreen(navController: NavController) {
                             )
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            OutlineFormField(
+                            BeautyPlusField(
                                 value = name,
                                 onValueChange = { text ->
                                     name = text
@@ -127,7 +131,7 @@ fun SignUpScreen(navController: NavController) {
                             )
 
                             Spacer(Modifier.height(10.dp))
-                            OutlineFormField(
+                            BeautyPlusField(
                                 value = mobileNumber,
                                 onValueChange = { text ->
                                     mobileNumber = text
@@ -137,7 +141,7 @@ fun SignUpScreen(navController: NavController) {
                             )
 
                             Spacer(Modifier.height(10.dp))
-                            OutlineFormField(
+                            BeautyPlusField(
                                 value = password,
                                 onValueChange = { text ->
                                     password = text
@@ -162,18 +166,95 @@ fun SignUpScreen(navController: NavController) {
                         RoundedButton(
                             text = "Register",
                             onClick = {
-                                if (name.isNotEmpty()) {
-                                    if (mobileNumber.isNotEmpty()) {
-                                        if (password.isNotEmpty()) {
-                                            val user = hashMapOf(
-                                                "name" to name,
-                                                "mobile" to mobileNumber,
-                                                "password" to password
-                                            )
-                                            db.collection("users")
-                                                .get()
-                                                .addOnSuccessListener { result ->
-                                                    if (result.isEmpty) {
+                                if (name.isEmpty()) {
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter name.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                } else if (!isValidText(name.trim())) {
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter valid name.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                }else if (mobileNumber.isEmpty()) {
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter mobile.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                }else  if (mobileNumber.length<10) {
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter valid mobile number.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                } else if (password.isEmpty()) {
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter password.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                } else {
+                                    beautySignup = true
+                                    val user = hashMapOf(
+                                        "name" to name,
+                                        "mobile" to mobileNumber,
+                                        "password" to password
+                                    )
+                                    db.collection("users")
+                                        .get()
+                                        .addOnSuccessListener { result ->
+                                            if (result.isEmpty) {
+                                                db.collection("users")
+                                                    .add(user)
+                                                    .addOnSuccessListener { documentReference ->
+                                                        preference.saveData(
+                                                            "isLogin",
+                                                            true
+                                                        )
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Registered successfully.",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                        navController.navigate(
+                                                            Screen.MainScreen.route
+                                                        ) {
+                                                            popUpTo(Screen.LoginScreen.route) {
+                                                                inclusive = true
+                                                            }
+                                                        }
+                                                        beautySignup = false
+                                                    }
+                                                    .addOnFailureListener { e ->
+
+                                                        Toast.makeText(
+                                                            context,
+                                                            e.message.toString(),
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                        beautySignup = false
+                                                    }
+                                            } else {
+                                                for (document in result) {
+                                                    if (document.data["mobile"] == mobileNumber &&
+                                                        document.data["password"] == password
+                                                    ) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "User Already exists.",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                        beautySignup = false
+                                                        return@addOnSuccessListener
+                                                    } else {
                                                         db.collection("users")
                                                             .add(user)
                                                             .addOnSuccessListener { documentReference ->
@@ -183,16 +264,17 @@ fun SignUpScreen(navController: NavController) {
                                                                 )
                                                                 Toast.makeText(
                                                                     context,
-                                                                    "Register successfully.",
+                                                                    "Registered successfully.",
                                                                     Toast.LENGTH_SHORT
                                                                 ).show()
                                                                 navController.navigate(
                                                                     Screen.MainScreen.route
                                                                 ) {
-                                                                    popUpTo(Screen.LoginScreen.route) {
+                                                                    popUpTo(Screen.SignUpScreen.route) {
                                                                         inclusive = true
                                                                     }
                                                                 }
+                                                                beautySignup = false
                                                             }
                                                             .addOnFailureListener { e ->
                                                                 Toast.makeText(
@@ -200,78 +282,22 @@ fun SignUpScreen(navController: NavController) {
                                                                     e.message.toString(),
                                                                     Toast.LENGTH_SHORT
                                                                 ).show()
+                                                                beautySignup = false
                                                             }
-                                                    } else {
-                                                        for (document in result) {
-                                                            if (document.data["mobile"] == mobileNumber &&
-                                                                document.data["password"] == password
-                                                            ) {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "Already exists.",
-                                                                    Toast.LENGTH_SHORT
-                                                                ).show()
-                                                                return@addOnSuccessListener
-                                                            } else {
-                                                                db.collection("users")
-                                                                    .add(user)
-                                                                    .addOnSuccessListener { documentReference ->
-                                                                        preference.saveData(
-                                                                            "isLogin",
-                                                                            true
-                                                                        )
-                                                                        Toast.makeText(
-                                                                            context,
-                                                                            "Register successfully.",
-                                                                            Toast.LENGTH_SHORT
-                                                                        ).show()
-                                                                        navController.navigate(Screen.MainScreen.route) {
-                                                                            popUpTo(Screen.SignUpScreen.route) {
-                                                                                inclusive = true
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    .addOnFailureListener { e ->
-                                                                        Toast.makeText(
-                                                                            context,
-                                                                            e.message.toString(),
-                                                                            Toast.LENGTH_SHORT
-                                                                        ).show()
-                                                                    }
-                                                            }
-                                                        }
                                                     }
                                                 }
-                                                .addOnFailureListener { exception ->
-                                                    Toast.makeText(
-                                                        context,
-                                                        exception.message.toString(),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
-                                        } else {
+                                            }
+                                        }
+                                        .addOnFailureListener { exception ->
                                             Toast.makeText(
                                                 context,
-                                                "Please enter password.",
-                                                Toast.LENGTH_LONG
+                                                exception.message.toString(),
+                                                Toast.LENGTH_SHORT
                                             ).show()
-
+                                            beautySignup = false
                                         }
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            "Please enter mobile number.",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-
-                                    }
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Please enter name.",
-                                        Toast.LENGTH_LONG
-                                    ).show()
                                 }
+
                             }
                         )
                     }
@@ -300,7 +326,21 @@ fun SignUpScreen(navController: NavController) {
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))
-
+                if (beautySignup) {
+                    Dialog(
+                        onDismissRequest = { },
+                        DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(100.dp)
+                                .background(white, shape = RoundedCornerShape(8.dp))
+                        ) {
+                            CircularProgressIndicator(color = appColor)
+                        }
+                    }
+                }
 
             }
         }
