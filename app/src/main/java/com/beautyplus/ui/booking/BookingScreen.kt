@@ -254,12 +254,13 @@ fun BookingScreen(navController: NavController) {
                             RoundedButton(
                                 text = "Submit",
                                 onClick = {
+                                    Log.e("TAG", "BookingScreen: ${mobileNumber.length}", )
                                     if (name.isNotEmpty()) {
-                                        if (!isValidText(name.trim())) {
+                                        if (isValidText(name.trim())) {
                                             if (email.isNotEmpty()) {
                                                 if (!isValidEmail(email.toString().trim())) {
                                                     if (mobileNumber.isNotEmpty()) {
-                                                        if (mobileNumber.length < 10) {
+                                                        if (mobileNumber.length <= 10) {
                                                             if (address.isNotEmpty()) {
                                                                 if (slotDropDown.isNotEmpty()) {
                                                                     isSubmit = true

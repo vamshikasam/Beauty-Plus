@@ -40,6 +40,7 @@ import com.beautyplus.ui.theme.white
 import com.beautyplus.utils.BeautyPlusField
 import com.beautyplus.utils.RoundedButton
 import com.beautyplus.utils.isValidEmail
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -52,9 +53,10 @@ fun LoginScreen(navController: NavController) {
         BeautyPlusPreference(context)
     }
     var beautyLogin by remember { mutableStateOf(false) }
-    var mobileNumber by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val db = Firebase.firestore
+    val firebaseAuth = FirebaseAuth.getInstance()
     BeautyPlusTheme {
         Scaffold {
             Box(
@@ -114,13 +116,12 @@ fun LoginScreen(navController: NavController) {
                             Spacer(modifier = Modifier.height(10.dp))
 
                             BeautyPlusField(
-                                value = mobileNumber,
+                                value = email,
                                 onValueChange = { text ->
-                                    if (text.length <= 10)
-                                        mobileNumber = text
+                                    email = text
                                 },
-                                placeholder = "Enter Mobile Number",
-                                keyboardType = KeyboardType.Phone,
+                                placeholder = "Enter email",
+                                keyboardType = KeyboardType.Email,
                             )
 
                             Spacer(Modifier.height(10.dp))
@@ -150,17 +151,17 @@ fun LoginScreen(navController: NavController) {
                         RoundedButton(
                             text = "Login",
                             onClick = {
-                                if (mobileNumber.isEmpty()) {
+                                if (email.isEmpty()) {
                                     Toast.makeText(
                                         context,
                                         "Please enter mobile.",
                                         Toast.LENGTH_LONG
                                     ).show()
 
-                                }else  if (mobileNumber.length<10) {
+                                }else  if (isValidEmail(email.trim())) {
                                     Toast.makeText(
                                         context,
-                                        "Please enter valid mobile number.",
+                                        "Please enter valid email.",
                                         Toast.LENGTH_LONG
                                     ).show()
 
@@ -173,69 +174,29 @@ fun LoginScreen(navController: NavController) {
 
                                 } else {
                                     beautyLogin = true
-                                    db.collection("users")
-                                        .get()
-                                        .addOnSuccessListener { result ->
-                                            if (result.isEmpty) {
+                                    firebaseAuth.signInWithEmailAndPassword(email.lowercase(), password)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                preference.saveData(
+                                                    "isLogin", true
+                                                )
                                                 Toast.makeText(
-                                                    context,
-                                                    "User not exist.",
-                                                    Toast.LENGTH_LONG
+                                                    context, "Login successfully.", Toast.LENGTH_SHORT
                                                 ).show()
-                                                beautyLogin = false
-                                                return@addOnSuccessListener
-                                            } else {
-                                                for (document in result) {
-                                                    if (document.data["mobile"] == mobileNumber &&
-                                                        document.data["password"] == password
-                                                    ) {
-                                                        preference.saveData(
-                                                            "isLogin",
-                                                            true
-                                                        )
-                                                        Toast.makeText(
-                                                            context,
-                                                            "Logged in successfully.",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
-                                                        navController.navigate(
-                                                            Screen.MainScreen.route
-                                                        ) {
-                                                            popUpTo(Screen.LoginScreen.route) {
-                                                                inclusive = true
-                                                            }
-                                                        }
-                                                        beautyLogin = false
-                                                    } else if (document.data["mobile"] == mobileNumber &&
-                                                        document.data["password"] != password
-                                                    ) {
-                                                        Toast.makeText(
-                                                            context,
-                                                            "Please enter valid password.",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
-                                                        beautyLogin = false
-                                                        return@addOnSuccessListener
-                                                    } else {
-                                                        Toast.makeText(
-                                                            context,
-                                                            "User not exist.",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
-                                                        beautyLogin = false
-                                                        return@addOnSuccessListener
+                                                navController.navigate(
+                                                    Screen.MainScreen.route
+                                                ) {
+                                                    popUpTo(Screen.LoginScreen.route) {
+                                                        inclusive = true
                                                     }
                                                 }
+                                                beautyLogin = false
+                                            } else {
+                                                Toast.makeText(
+                                                    context, task.exception?.message.toString(), Toast.LENGTH_SHORT
+                                                ).show()
+                                                beautyLogin = false
                                             }
-
-                                        }
-                                        .addOnFailureListener { exception ->
-                                            Toast.makeText(
-                                                context,
-                                                exception.message.toString(),
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                            beautyLogin = false
                                         }
                                 }
                             }
@@ -260,7 +221,7 @@ fun LoginScreen(navController: NavController) {
                             .clickable {
                                 navController.navigate(Screen.SignUpScreen.route)
                             }, textAlign = TextAlign.End,
-                        style = TextStyle(color = colorResource(id = R.color.appColor))
+                        style = TextStyle(color = colorResource(id = R.color.white))
                     )
                 }
 

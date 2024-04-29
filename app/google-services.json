@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "346233869200",
-    "project_id": "beauty-plus-b26cf",
-    "storage_bucket": "beauty-plus-b26cf.appspot.com"
+    "project_number": "635600984962",
+    "project_id": "beauty-plus-70186",
+    "storage_bucket": "beauty-plus-70186.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:346233869200:android:c5ef56c10a97f1ae9cd915",
+        "mobilesdk_app_id": "1:635600984962:android:4fa41a9683a72fb65dcd9b",
         "android_client_info": {
           "package_name": "com.beautyplus"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDCBQMWnUb8XA119VUbPw8HsTOFkxOgDoE"
+          "current_key": "AIzaSyC6HFKJvX_n-umjUFBsQ7mFnVKT8qgR2SU"
         }
       ],
       "services": {
